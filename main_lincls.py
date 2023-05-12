@@ -330,7 +330,8 @@ def train(train_loader, model, criterion, optimizer, epoch, args):
     progress = ProgressMeter(
         len(train_loader),
         [batch_time, data_time, losses, top1, top5],
-        prefix="Epoch: [{}]".format(epoch))
+        prefix=f"Epoch: [{epoch}]",
+    )
 
     """
     Switch to eval mode:
@@ -428,7 +429,7 @@ def sanity_check(state_dict, pretrained_weights):
     Linear classifier should not change any weights other than the linear layer.
     This sanity check asserts nothing wrong happens (e.g., BN stats updated).
     """
-    print("=> loading '{}' for sanity check".format(pretrained_weights))
+    print(f"=> loading '{pretrained_weights}' for sanity check")
     checkpoint = torch.load(pretrained_weights, map_location="cpu")
     state_dict_pre = checkpoint['state_dict']
 
@@ -438,11 +439,15 @@ def sanity_check(state_dict, pretrained_weights):
             continue
 
         # name in pretrained model
-        k_pre = 'module.encoder.' + k[len('module.'):] \
-            if k.startswith('module.') else 'module.encoder.' + k
+        k_pre = (
+            'module.encoder.' + k[len('module.') :]
+            if k.startswith('module.')
+            else f'module.encoder.{k}'
+        )
 
-        assert ((state_dict[k].cpu() == state_dict_pre[k_pre]).all()), \
-            '{} is changed in linear classifier training.'.format(k)
+        assert (
+            state_dict[k].cpu() == state_dict_pre[k_pre]
+        ).all(), f'{k} is changed in linear classifier training.'
 
     print("=> sanity check passed.")
 
@@ -485,7 +490,7 @@ class ProgressMeter(object):
     def _get_batch_fmtstr(self, num_batches):
         num_digits = len(str(num_batches // 1))
         fmt = '{:' + str(num_digits) + 'd}'
-        return '[' + fmt + '/' + fmt.format(num_batches) + ']'
+        return f'[{fmt}/{fmt.format(num_batches)}]'
 
 
 def adjust_learning_rate(optimizer, init_lr, epoch, args):

@@ -276,7 +276,8 @@ def train(train_loader, model, criterion, optimizer, epoch, args):
     progress = ProgressMeter(
         len(train_loader),
         [batch_time, data_time, losses],
-        prefix="Epoch: [{}]".format(epoch))
+        prefix=f"Epoch: [{epoch}]",
+    )
 
     # switch to train mode
     model.train()
@@ -353,7 +354,7 @@ class ProgressMeter(object):
     def _get_batch_fmtstr(self, num_batches):
         num_digits = len(str(num_batches // 1))
         fmt = '{:' + str(num_digits) + 'd}'
-        return '[' + fmt + '/' + fmt.format(num_batches) + ']'
+        return f'[{fmt}/{fmt.format(num_batches)}]'
 
 
 def adjust_learning_rate(optimizer, init_lr, epoch, args):
